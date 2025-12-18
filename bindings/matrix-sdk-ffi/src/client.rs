@@ -1232,6 +1232,24 @@ impl Client {
         let user_id = self.inner.user_id().context("No User ID found")?;
         Ok(user_id.server_name().to_string())
     }
+    
+    
+    //added code to try and retrieve OIDC token
+    pub fn oidc_access_token(&self) -> Option<String> {
+
+        let auth_api = self.inner.auth_api().ok()?;
+
+        match auth_api{
+            AuthApi::OAuth(oauth) => {
+                let session = oauth.user_session().ok()?;
+                Some(session.tokens.access_token)
+            }
+            _=> None,
+        }
+    }
+
+
+
 
     pub async fn display_name(&self) -> Result<String, ClientError> {
         let display_name =
